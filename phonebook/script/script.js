@@ -135,12 +135,10 @@ const data = [
     form.append(...btnGroup.btns);
 
     overlay.append(form);
-    const btnClose = form.querySelector('.close');
 
     return {
       overlay,
       form,
-      btnClose,
     };
   };
 
@@ -155,6 +153,7 @@ const data = [
         <th>Имя</th>
         <th>Фамилия</th>
         <th>Телефон</th>
+        <th>Изменить</th>
       </tr>
     `);
 
@@ -194,6 +193,7 @@ const data = [
       list: table.tbody,
       logo,
       btnAdd: btnGroup.btns[0],
+      btnDel: btnGroup.btns[1],
       formOverlay: form.overlay,
       form: form.form,
       btnClose: form.btnClose,
@@ -202,6 +202,7 @@ const data = [
 
   const createRow = ({name: firstName, surname, phone}) => {
     const tr = document.createElement('tr');
+    tr.classList.add('contact');
 
     const tdDel = document.createElement('td');
     tdDel.classList.add('delete');
@@ -257,7 +258,7 @@ const data = [
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list, logo, btnAdd, formOverlay, form, btnClose} = phoneBook;
+    const {list, logo, btnAdd, formOverlay, btnDel} = phoneBook;
 
     // Функционал
     const allRow = renderContacts(list, data);
@@ -268,16 +269,22 @@ const data = [
       formOverlay.classList.add('is-visible');
     });
 
-    btnClose.addEventListener('click', () => {
-      formOverlay.classList.remove('is-visible');
+    formOverlay.addEventListener('click', ({target}) => {
+      if (target === formOverlay || target.closest('.close')) {
+        formOverlay.classList.remove('is-visible');
+      }
     });
 
-    form.addEventListener('click', (event) => {
-      event.stopImmediatePropagation();
+    btnDel.addEventListener('click', () => {
+      document.querySelectorAll('.delete').forEach(del => {
+        del.classList.toggle('is-visible');
+      });
     });
 
-    formOverlay.addEventListener('click', () => {
-      formOverlay.classList.remove('is-visible');
+    list.addEventListener('click', ({target}) => {
+      if (target.closest('.del-icon')) {
+        target.closest('.contact').remove();
+      }
     });
   };
 
