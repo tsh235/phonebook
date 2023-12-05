@@ -150,8 +150,8 @@ const data = [
     thead.insertAdjacentHTML('beforeend', `
       <tr>
         <th class="delete"> Удалить</th>
-        <th>Имя</th>
-        <th>Фамилия</th>
+        <th class="firstName">Имя</th>
+        <th class="surName">Фамилия</th>
         <th>Телефон</th>
         <th>Изменить</th>
       </tr>
@@ -190,13 +190,13 @@ const data = [
     app.append(header, main, footer);
 
     return {
+      table,
       list: table.tbody,
       logo,
       btnAdd: btnGroup.btns[0],
       btnDel: btnGroup.btns[1],
       formOverlay: form.overlay,
       form: form.form,
-      btnClose: form.btnClose,
     };
   };
 
@@ -254,11 +254,39 @@ const data = [
     });
   };
 
+  const sortTable = (table, list) => {
+    const sortTh = [
+      table.querySelector('.firstName'),
+      table.querySelector('.surName'),
+    ];
+    const rows = [...list.rows];
+
+    sortTh.forEach(th => {
+      th.addEventListener('click', () => {
+        const columnIndex = th.cellIndex;
+        const sortDirection = 'asc';
+
+        rows.sort((a, b) => {
+          const aValue = a.cells[columnIndex].textContent;
+          const bValue = b.cells[columnIndex].textContent;
+
+          if (sortDirection === 'asc') {
+            return aValue > bValue ? 1 : -1;
+          } else {
+            return bValue > aValue ? 1 : -1;
+          }
+        });
+
+        rows.forEach(row => list.append(row));
+      });
+    });
+  };
+
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list, logo, btnAdd, formOverlay, btnDel} = phoneBook;
+    const {table, list, logo, btnAdd, formOverlay, btnDel} = phoneBook;
 
     // Функционал
     const allRow = renderContacts(list, data);
@@ -286,6 +314,8 @@ const data = [
         target.closest('.contact').remove();
       }
     });
+
+    sortTable(table, list);
   };
 
   window.phoneBookInit = init;
