@@ -1,32 +1,19 @@
 'use strict';
 
-const data = [
-  {
-    name: 'Иван',
-    surname: 'Петров',
-    phone: '+79514545454',
-  },
-  {
-    name: 'Игорь',
-    surname: 'Семёнов',
-    phone: '+79999999999',
-  },
-  {
-    name: 'Семён',
-    surname: 'Иванов',
-    phone: '+79800252525',
-  },
-  {
-    name: 'Мария',
-    surname: 'Попова',
-    phone: '+79876543210',
-  },
-];
-
 {
-  const addContactData = (contact) => {
-    data.push(contact);
-    console.log('data: ', data);
+  const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
+
+  const setStorage = (key, value) => {
+    const data = getStorage(key);
+    data.push(value);
+    localStorage.setItem(key, JSON.stringify(data));
+  };
+
+  const removeStorage = (key, phone) => {
+    const data = getStorage(key);
+
+    const filteredData = data.filter(item => item.phone !== phone);
+    localStorage.setItem(key, JSON.stringify(filteredData));
   };
 
   const createContainer = () => {
@@ -223,6 +210,7 @@ const data = [
     tdSurname.textContent = surname;
 
     const tdPhone = document.createElement('td');
+    tdPhone.classList.add('phone');
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
@@ -239,7 +227,8 @@ const data = [
     return tr;
   };
 
-  const renderContacts = (elem, data) => {
+  const renderContacts = (key, elem) => {
+    const data = getStorage(key);
     const allRow = data.map(createRow);
 
     elem.append(...allRow);
@@ -259,7 +248,7 @@ const data = [
     });
   };
 
-  const sortTable = (table, list) => {
+  const sortTable = (key, table, list) => {
     const sortTh = [
       table.querySelector('.firstName'),
       table.querySelector('.surName'),
@@ -309,7 +298,7 @@ const data = [
     };
   };
 
-  const deleteControl = (btnDel, list) => {
+  const deleteControl = (title, btnDel, list) => {
     btnDel.addEventListener('click', () => {
       document.querySelectorAll('.delete').forEach(del => {
         del.classList.toggle('is-visible');
@@ -318,7 +307,10 @@ const data = [
 
     list.addEventListener('click', ({target}) => {
       if (target.closest('.del-icon')) {
-        target.closest('.contact').remove();
+        const row = target.closest('.contact');
+        const phone = row.querySelector('.phone').textContent;
+        removeStorage(title, phone);
+        row.remove();
       }
     });
   };
@@ -327,7 +319,7 @@ const data = [
     list.append(createRow(contact));
   };
 
-  const formControl = (form, list, closeModal) => {
+  const formControl = (title, form, list, closeModal) => {
     form.addEventListener('submit', e => {
       e.preventDefault();
 
@@ -336,7 +328,7 @@ const data = [
       const newContact = Object.fromEntries(formData);
 
       addContactPage(newContact, list);
-      addContactData(newContact);
+      setStorage(title, newContact);
 
       form.reset();
       closeModal();
@@ -345,6 +337,7 @@ const data = [
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
+    getStorage(title);
 
     const {
       table,
@@ -357,13 +350,13 @@ const data = [
     } = renderPhoneBook(app, title);
 
     // Функционал
-    const allRow = renderContacts(list, data);
+    const allRow = renderContacts(title, list);
     const {closeModal} = modalControl(btnAdd, formOverlay);
 
     hoverRow(allRow, logo);
-    deleteControl(btnDel, list);
-    sortTable(table, list);
-    formControl(form, list, closeModal);
+    deleteControl(title, btnDel, list);
+    sortTable(title, table, list);
+    formControl(title, form, list, closeModal);
   };
 
   window.phoneBookInit = init;
