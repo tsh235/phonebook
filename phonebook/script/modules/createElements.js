@@ -148,6 +148,7 @@ export const createRow = ({name: firstName, surname, phone}) => {
 
   const buttonDel = document.createElement('button');
   buttonDel.classList.add('del-icon');
+  buttonDel.dataset.phone = phone;
   tdDel.append(buttonDel);
 
   const tdName = document.createElement('td');
@@ -157,7 +158,7 @@ export const createRow = ({name: firstName, surname, phone}) => {
   tdSurname.textContent = surname;
 
   const tdPhone = document.createElement('td');
-  tdPhone.classList.add('phone');
+
   const phoneLink = document.createElement('a');
   phoneLink.href = `tel:${phone}`;
   phoneLink.textContent = phone;

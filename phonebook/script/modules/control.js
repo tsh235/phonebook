@@ -37,9 +37,9 @@ export const deleteControl = (title, btnDel, list) => {
   list.addEventListener('click', ({target}) => {
     if (target.closest('.del-icon')) {
       const row = target.closest('.contact');
-      const phone = row.querySelector('.phone').textContent;
-      removeStorage(title, phone);
+      const phone = target.dataset.phone;
       row.remove();
+      removeStorage(title, phone);
     }
   });
 };

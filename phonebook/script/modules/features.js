@@ -11,8 +11,6 @@ const hoverRow = (allRow, logo) => {
 };
 
 const sortTable = (table, list) => {
-  console.log('table: ', table);
-  console.log('list: ', list);
   const sortTh = [
     table.querySelector('.firstName'),
     table.querySelector('.surName'),
